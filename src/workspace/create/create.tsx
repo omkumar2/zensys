@@ -1,6 +1,6 @@
 import './create.scss';
 
 const Create = () => {
-    return
+    return <div className="create">Create</div>;
 }
 export default Create;
