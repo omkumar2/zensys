@@ -2,42 +2,45 @@ import "./structure.scss";
 import { useState } from "react";
 import { v7 } from "uuid";
 import { priorityBand } from "./helper";
-type Tag = {
-  id: string;
-  label: string;
-  priority: number;
-};
+import { Tag } from "@/types/tag";
+import {useTags} from "@/hooks/useTag";
 
 const Structure = () => {
-  const [tags, setTags] = useState<Tag[]>([]);
+    const {tags, loading, error, reload, saveTag} = useTags();
+    
   const [tagInput, setTagInput] = useState("");
 
   const addTag = () => {
     if (!tagInput.trim()) return;
 
-    setTags(prev => [
-      ...prev,
-      {
+    const newTag: Tag = {
         id: v7(),
         label: tagInput.trim(),
+        description: "",
         priority: 0.1
       }
-    ]);
+
+    saveTag(newTag);
     setTagInput("");
   };
 
-  const updatePriority = (id: string, priority: number) => {
-    setTags(prev =>
-      prev.map(tag =>
-        tag.id === id ? { ...tag, priority } : tag
-      )
+  const updatePriority = () => {
+    
+  };
+
+  const removeTag = () => {
+   
+  };
+
+  {
+    loading && <p>Loading tags...</p>;
+  }
+  {
+    error && (<><p className="error">Error loading tags.</p>
+        <p>{String(error)}</p>
+        </>
     );
-  };
-
-  const removeTag = (id: string) => {
-    setTags(prev => prev.filter(tag => tag.id !== id));
-  };
-
+  }
   return (
     <div className="structure">
       <h3>Structure</h3>
@@ -68,16 +71,14 @@ const Structure = () => {
               max={1}
               step={0.01}
               value={tag.priority}
-              onChange={e =>
-                updatePriority(tag.id, Number(e.target.value))
-              }
+             
             />
 
             <span className="priority">{tag.priority}</span>
 
             <button
               className="delete"
-              onClick={() => removeTag(tag.id)}
+            //   onClick={() => removeTag(tag.id)}
             >
               ✕
             </button>
