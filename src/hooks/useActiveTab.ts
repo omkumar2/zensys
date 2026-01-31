@@ -1,6 +1,6 @@
 import { useTabStore } from "@/store/useTabStore";
 import { TabType } from "@/types/tab";
-import { useCallback } from "react";
+// import { useCallback } from "react";
 
 export const useActiveTab = () => {
     const { activeTabId, tabs, switchTab } = useTabStore();
