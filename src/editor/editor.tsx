@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import "./editor.scss";
 import BlockMenu from "./blockMenu";
-
+import { focusEnd } from "@/helper/focusEl";
 
 type BlockType =
   | "text"
   | "heading1"
   | "heading2"
   | "bullet-list"
-  | 'divider'
-  | 'number-list'
+  | "divider"
+  | "number-list"
   | "quote";
 
 type Block = {
@@ -20,11 +20,10 @@ type Block = {
 
 const Editor = () => {
   const [blocks, setBlocks] = useState<Block[]>([
-    { id: crypto.randomUUID(), content: "", type: "text" }
+    { id: crypto.randomUUID(), content: "", type: "text" },
   ]);
 
-  const [openMenu, setOpenMenu] =
-    useState<null | "add" | "more">(null);
+  const [openMenu, setOpenMenu] = useState<null | "add" | "more">(null);
 
   const blockRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const blockMenuRef = useRef<HTMLDivElement>(null);
@@ -43,8 +42,7 @@ const Editor = () => {
     };
 
     document.addEventListener("mousedown", handleMouseDown);
-    return () =>
-      document.removeEventListener("mousedown", handleMouseDown);
+    return () => document.removeEventListener("mousedown", handleMouseDown);
   }, []);
 
   /* -----------------------------
@@ -52,26 +50,29 @@ const Editor = () => {
      insert block after index
   -------------------------------- */
   const deleteBlock = (index: number) => {
-    
-    const id = index>0 ? blocks[index-1].id : null;
-    setBlocks(prev => {
-        const next = [...prev]
-        next.splice(index,1)
-        return next
-    })
+      if (blocks.length === 1) return;
+    const id = index > 0 ? blocks[index - 1].id : null;
+    setBlocks((prev) => {
+      const next = [...prev];
+      next.splice(index, 1);
+      return next;
+    });
     requestAnimationFrame(() => {
- if (id) blockRefs.current.get(id)?.focus();
-    }
-)
-  }
-const insertBlockAfter = (index: number, type: BlockType) => {
+      if (id) {
+        const el = blockRefs.current.get(id);
+        if (el) {
+            focusEnd(el)
+        }
+    }});
+  };
+  const insertBlockAfter = (index: number, type: BlockType) => {
     const newBlock: Block = {
       id: crypto.randomUUID(),
       content: "",
-      type
+      type,
     };
 
-    setBlocks(prev => {
+    setBlocks((prev) => {
       const next = [...prev];
       next.splice(index + 1, 0, newBlock);
       return next;
@@ -83,30 +84,30 @@ const insertBlockAfter = (index: number, type: BlockType) => {
   };
 
   const changeBlockType = (index: number, type: Block["type"]) => {
-  setBlocks(prev => {
-    const next = [...prev];
-    next[index] = { ...next[index], type };
-    return next;
-  });
-};
+    setBlocks((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], type };
+      return next;
+    });
+  };
 
-const backSpaceHandler = (
+  const backSpaceHandler = (
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number,
-    text: string
-) => {
-    if (text === '' && e.key === "Backspace") {
-        e.preventDefault();
-        deleteBlock(index);
+    text: string,
+  ) => {
+    if (text === "" && e.key === "Backspace") {
+      e.preventDefault();
+      deleteBlock(index);
     }
-}
+  };
   /* -----------------------------
      Enter key handler
   -------------------------------- */
   const handleEnter = (
     e: React.KeyboardEvent<HTMLDivElement>,
     index: number,
-    type: BlockType = 'text'
+    type: BlockType = "text",
   ) => {
     if (e.key !== "Enter") return;
 
@@ -120,16 +121,14 @@ const backSpaceHandler = (
         {blocks.map((block, index) => (
           <div className="editor-block-row" key={block.id}>
             <div
-              className={`editor-block-controls ${
-                openMenu ? "active" : ""
-              }`}
+              className={`editor-block-controls ${openMenu ? "active" : ""}`}
             >
               <button
                 className="add"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpenMenu(prev => (prev === "add" ? null : "add"));
+                  setOpenMenu((prev) => (prev === "add" ? null : "add"));
                 }}
               >
                 +
@@ -140,7 +139,7 @@ const backSpaceHandler = (
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpenMenu(prev => (prev === "more" ? null : "more"));
+                  setOpenMenu((prev) => (prev === "more" ? null : "more"));
                 }}
               >
                 ⋮⋮
@@ -157,17 +156,21 @@ const backSpaceHandler = (
               }}
               onKeyDown={(e) => {
                 backSpaceHandler(e, index, block.content);
-block.type === 'bullet-list' && handleEnter(e, index, 'bullet-list');
-block.type !== 'bullet-list' &&
-                  handleEnter(e, index);
+                block.type === "bullet-list" &&
+                  handleEnter(e, index, "bullet-list");
+                block.type !== "bullet-list" && handleEnter(e, index);
+              }}
+              onInput={(e) => {
+                const text = e.currentTarget.textContent ?? "";
 
-                  
-
-                }
-                
-            }
+                setBlocks((prev) => {
+                  const next = [...prev];
+                  next[index] = { ...next[index], content: text };
+                  return next;
+                });
+              }}
             >
-              {block.content}
+              
             </div>
 
             {openMenu === "add" && index === blocks.length - 1 && (
@@ -175,23 +178,21 @@ block.type !== 'bullet-list' &&
                 blockMenuRef={blockMenuRef as React.RefObject<HTMLDivElement>}
                 onClose={() => setOpenMenu(null)}
                 onClick_text={() => {
-                  insertBlockAfter(index, 'text');
+                  insertBlockAfter(index, "text");
                   setOpenMenu(null);
-                }
-                
-            }
-            onClick_heading1={()=>{
-                insertBlockAfter(index, 'heading1')
-                setOpenMenu(null)
-            }}
-            onClick_heading2={()=>{
-                insertBlockAfter(index, 'heading2')
-                setOpenMenu(null)
-            }}
-            onClick_bulletlist={()=>{
-                insertBlockAfter(index,'bullet-list')
-                setOpenMenu(null)
-            }}
+                }}
+                onClick_heading1={() => {
+                  insertBlockAfter(index, "heading1");
+                  setOpenMenu(null);
+                }}
+                onClick_heading2={() => {
+                  insertBlockAfter(index, "heading2");
+                  setOpenMenu(null);
+                }}
+                onClick_bulletlist={() => {
+                  insertBlockAfter(index, "bullet-list");
+                  setOpenMenu(null);
+                }}
               />
             )}
           </div>
