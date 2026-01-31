@@ -8,9 +8,10 @@ type BlockMenuProps = {
   onClick_text: () => void
   onClick_heading1: () => void;
   onClick_heading2: () => void;
+  onClick_bulletlist: () => void;
 };
 
-const BlockMenu = ({ onClose, blockMenuRef, onClick_text, onClick_heading1, onClick_heading2 }: BlockMenuProps) => {
+const BlockMenu = ({ onClose, blockMenuRef, onClick_text, onClick_heading1, onClick_heading2, onClick_bulletlist }: BlockMenuProps) => {
   return (
     <div
       ref={blockMenuRef}
@@ -38,7 +39,7 @@ const BlockMenu = ({ onClose, blockMenuRef, onClick_text, onClick_heading1, onCl
           <div className="menu-item-hint">##</div>
         </div>
 
-        <div className="menu-item">
+        <div className="menu-item" onClick={()=>onClick_bulletlist()}>
           <div className="menu-item-identifier">•</div>
           <div className="menu-item-label">Bulleted list</div>
           <div className="menu-item-hint">-</div>

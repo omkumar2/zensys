@@ -51,6 +51,19 @@ const Editor = () => {
      Single source of truth:
      insert block after index
   -------------------------------- */
+  const deleteBlock = (index: number) => {
+    
+    const id = index>0 ? blocks[index-1].id : null;
+    setBlocks(prev => {
+        const next = [...prev]
+        next.splice(index,1)
+        return next
+    })
+    requestAnimationFrame(() => {
+ if (id) blockRefs.current.get(id)?.focus();
+    }
+)
+  }
 const insertBlockAfter = (index: number, type: BlockType) => {
     const newBlock: Block = {
       id: crypto.randomUUID(),
@@ -77,17 +90,28 @@ const insertBlockAfter = (index: number, type: BlockType) => {
   });
 };
 
+const backSpaceHandler = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    index: number,
+    text: string
+) => {
+    if (text === '' && e.key === "Backspace") {
+        e.preventDefault();
+        deleteBlock(index);
+    }
+}
   /* -----------------------------
      Enter key handler
   -------------------------------- */
   const handleEnter = (
     e: React.KeyboardEvent<HTMLDivElement>,
-    index: number
+    index: number,
+    type: BlockType = 'text'
   ) => {
     if (e.key !== "Enter") return;
 
     e.preventDefault();
-    insertBlockAfter(index, "text");
+    insertBlockAfter(index, type);
   };
 
   return (
@@ -131,7 +155,17 @@ const insertBlockAfter = (index: number, type: BlockType) => {
               ref={(el) => {
                 if (el) blockRefs.current.set(block.id, el);
               }}
-              onKeyDown={(e) => handleEnter(e, index)}
+              onKeyDown={(e) => {
+                backSpaceHandler(e, index, block.content);
+block.type === 'bullet-list' && handleEnter(e, index, 'bullet-list');
+block.type !== 'bullet-list' &&
+                  handleEnter(e, index);
+
+                  
+
+                }
+                
+            }
             >
               {block.content}
             </div>
@@ -152,6 +186,10 @@ const insertBlockAfter = (index: number, type: BlockType) => {
             }}
             onClick_heading2={()=>{
                 insertBlockAfter(index, 'heading2')
+                setOpenMenu(null)
+            }}
+            onClick_bulletlist={()=>{
+                insertBlockAfter(index,'bullet-list')
                 setOpenMenu(null)
             }}
               />
