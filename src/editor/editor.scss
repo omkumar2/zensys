@@ -1,8 +1,20 @@
 .editor {
+  position: relative;
   overflow: auto;
   height: calc(100% - 2rem);
   width: calc(100% - 12rem);
   padding: 1rem 6rem;
+  .editor-save-btn{
+    right: 10px;
+    padding: 10px 10px;
+    border-radius: 10px;
+    border: none;
+    position: fixed;
+    &:hover{
+      background-color: #aaa;
+      cursor: pointer;
+    }
+  }
   .editable-content {
     border-left: 1px solid #000;
     min-height: 100%;

@@ -22,6 +22,12 @@ export type Item = {
   disabled?: boolean;
 };
 
+export type Block = {
+  id: string;
+  content: string;
+  type: BlockType;
+};
+
 export const BLOCK_ITEMS: Item[] = [
   {
     type: "text",
@@ -33,19 +39,19 @@ export const BLOCK_ITEMS: Item[] = [
     type: "heading1",
     label: "Heading 1",
     icon: "H1",
-    hint: "# + ",
+    hint: "#",
   },
   {
     type: "heading2",
     label: "Heading 2",
     icon: "H2",
-    hint: "## + ",
+    hint: "##",
   },
   {
     type: "heading3",
     label: "Heading 3",
     icon: "H3",
-    hint: "### + ",
+    hint: "###",
   },
   {
     type: "page",
@@ -61,25 +67,25 @@ export const BLOCK_ITEMS: Item[] = [
     type: "bullet-list",
     label: "Bulleted list",
     icon: "•–",
-    hint: "- + ",
+    hint: "-",
   },
   {
     type: "number-list",
     label: "Numbered list",
     icon: "1–",
-    hint: "1. + ",
+    hint: "1.",
   },
   {
     type: "todo",
     label: "To-do list",
     icon: "☑",
-    hint: "[] + ",
+    hint: "[]",
   },
   {
     type: "toggle",
     label: "Toggle list",
     icon: "▶",
-    hint: "> + ",
+    hint: ">",
   },
   {
     type: "code",
@@ -91,7 +97,7 @@ export const BLOCK_ITEMS: Item[] = [
     type: "quote",
     label: "Quote",
     icon: "❝",
-    hint: '" + ',
+    hint: '"',
   },
   {
     type: "callout",

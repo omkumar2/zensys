@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./blockMenu.scss";
 import BlockTypeMenu from "./blockTypeMenu";
 import TextColorMenu from "./textColorMenu";
-import { Block } from "./useEditorZen";
+import { Block } from "@/types/editor";
 import { BLOCK_ITEMS, BlockType } from "@/types/editor";
 
 type BlockMenuProps = {
@@ -11,6 +11,7 @@ type BlockMenuProps = {
   onClose: () => void;
   blockMenuRef: React.RefObject<HTMLDivElement>;
   onClick_BlockMenuItem: (changeToType: BlockType) => void
+  focusId: React.RefObject<string | null>
 };
 
 const BlockMenu = ({
@@ -18,7 +19,7 @@ const BlockMenu = ({
   openMenuProp,
   onClose,
   blockMenuRef,
- 
+ focusId,
   onClick_BlockMenuItem
 }: BlockMenuProps) => {
   const [blockTypeMenuToggle, setBlockTypeMenuToggle] = useState(false);
@@ -100,8 +101,8 @@ const BlockMenu = ({
         {blockTypeMenuToggle && (
           <BlockTypeMenu
             selectedBlock={block}
-            onSelect={(type) => {
-              // TODO: wire changeBlockType
+            onSelect={(id) => {
+              focusId.current = id
             }}
           />
         )}

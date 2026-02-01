@@ -1,5 +1,7 @@
 use crate::{utils::get_app_dir, schema::{MemoryNode, MemoryItem}};
-use tauri::{AppHandle, Manager, command};
+use tauri::{AppHandle,
+    //  Manager,
+      command};
 // use tokio::fs as tokio_fs;
 
 
@@ -53,6 +55,7 @@ pub fn save_memory_node(app:AppHandle, memory_node:MemoryNode)-> Result<(),Strin
     
     let tmp_path = nodes_dir.join("metadata.json.tmp");
     let final_path = nodes_dir.join("metadata.json");
+
     std::fs::write(&tmp_path, json).map_err(|e| format!("Cannot write temp node file: {}", e))?;
     std::fs::rename(&tmp_path, &final_path).map_err(|e| format!("Cannot finalize node write: {}", e))?;
     Ok(())

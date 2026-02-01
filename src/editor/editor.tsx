@@ -48,6 +48,9 @@ const Editor = () => {
 
   return (
     <div className="editor">
+      <button className="editor-save-btn">
+        Save
+      </button>
       <div className="editable-content">
         {blocks.map((block) => (
           <div className="editor-block-row" key={block.id}>
@@ -118,6 +121,7 @@ const Editor = () => {
             {openMenu?.blockId === block.id && (
               <BlockMenu
                 block={block}
+                focusId={pendingFocusId}
                 openMenuProp={openMenu}
                 blockMenuRef={blockMenuRef as React.RefObject<HTMLDivElement>}
                 onClose={() => setOpenMenu(null)}

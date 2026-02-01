@@ -7,6 +7,7 @@ export const MemoryNodeService = () => {
     title: string,
     memory_type: MemoryType,
     content: unknown,
+    content_string: string,
     comment: string,
     parent_node_id?: string,
   ) => {
@@ -16,7 +17,8 @@ export const MemoryNodeService = () => {
       parent_node_id,
       title,
       memory_type,
-      content: JSON.stringify(content),
+      content_string,
+      content_json: JSON.stringify(content),
       created_at: new Date().toISOString(),
       change_reason: comment,
     };

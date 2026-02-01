@@ -1,11 +1,12 @@
 import "./blockTypeMenu.scss";
-import { Block, useEditorZen } from "./useEditorZen";
+import { useEditorZen } from "./useEditorZen";
+import { Block } from "@/types/editor";
 
 import { BlockType,BLOCK_ITEMS as ITEMS } from "@/types/editor";
 
 type Props = {
   selectedBlock: Block;
-  onSelect: (type: BlockType) => void;
+  onSelect: (blockId:string) => void;
 };
 
 const BlockTypeMenu = ({ selectedBlock, onSelect }: Props) => {
@@ -23,7 +24,7 @@ const BlockTypeMenu = ({ selectedBlock, onSelect }: Props) => {
             if (!item.disabled) {
               changeBlockType(selectedBlock.id, item.type);
               setOpenMenu(null);
-              onSelect(item.type);
+              onSelect(selectedBlock.id);
             }
           }}
         >

@@ -12,7 +12,8 @@ export type MemoryNode = {
   memory_id: string
   parent_node_id?: string
   created_at: string
-  content: string
+  content_string: string
+  content_json: string
   title: string
   memory_type: MemoryType
   change_reason?: string

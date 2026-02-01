@@ -10,7 +10,7 @@ export const MemoryItemService = () => {
             created_at: new Date().toISOString(),
             active_node_id: "",
         }
-        const memoryNode = createMemoryNode(newMemoryItem.memory_id, title, type,{},"Initial creation", undefined);
+        const memoryNode = createMemoryNode(newMemoryItem.memory_id, title, type,null,'',"Initial creation", undefined);
         const memoryItem: MemoryItem = {
             ...newMemoryItem,
             active_node_id: memoryNode.node_id,
