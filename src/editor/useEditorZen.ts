@@ -7,7 +7,10 @@ export type Block = {
   type: BlockType;
 };
 
-type OpenMenu = null | "add" | "more" | "drag";
+type OpenMenu ={
+  blockId: string;
+  type: "add" | "more";
+} | null;
 
 type EditorState = {
   /* ---------- STATE ---------- */

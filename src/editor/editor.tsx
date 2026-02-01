@@ -15,21 +15,34 @@ const Editor = () => {
     deleteBlock,
     updateBlockContent,
   } = useEditorZen();
-
-  useEffect(() => {
-  if (!pendingFocusId.current) return;
-
-  const el = blockRefs.current.get(pendingFocusId.current);
-  if (el) {
-    focusEnd(el);
-  }
-
-  pendingFocusId.current = null;
-}, [blocks]);
-
-  /* ---------- DOM refs (local, NOT in store) ---------- */
   const blockRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const blockMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!pendingFocusId.current) return;
+
+    const el = blockRefs.current.get(pendingFocusId.current);
+    if (el) {
+      focusEnd(el);
+    }
+
+    pendingFocusId.current = null;
+  }, [blocks]);
+  useEffect(() => {
+    const handleDropDownClose = (e: MouseEvent) => {
+      if (
+        blockMenuRef.current &&
+        !blockMenuRef.current.contains(e.target as Node)
+      ) {
+        setOpenMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleDropDownClose);
+    return () => document.removeEventListener("mousedown", handleDropDownClose);
+  }, []);
+
+  /* ---------- DOM refs (local, NOT in store) ---------- */
 
   return (
     <div className="editor">
@@ -45,7 +58,7 @@ const Editor = () => {
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpenMenu(openMenu === "add" ? null : "add");
+                  setOpenMenu({blockId: block.id, type: 'add'});
                 }}
               >
                 +
@@ -56,7 +69,7 @@ const Editor = () => {
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpenMenu(openMenu === "more" ? null : "more");
+                  setOpenMenu({blockId: block.id , type: 'more'});
                 }}
               >
                 ⋮⋮
@@ -88,8 +101,10 @@ const Editor = () => {
                 /* Enter → insert block */
                 if (e.key === "Enter") {
                   e.preventDefault();
-                 pendingFocusId.current =  insertBlockAfter(block.id, block.type);
-                 
+                  pendingFocusId.current = insertBlockAfter(
+                    block.id,
+                    block.type,
+                  );
                 }
               }}
               onInput={(e) =>
@@ -98,36 +113,54 @@ const Editor = () => {
             />
 
             {/* ---------- MENU ---------- */}
-            {openMenu && (
+            {openMenu?.blockId === block.id && (
               <BlockMenu
                 block={block}
-                type={openMenu}
+                openMenuProp={openMenu}
                 blockMenuRef={blockMenuRef as React.RefObject<HTMLDivElement>}
                 onClose={() => setOpenMenu(null)}
                 onClick_text={() => {
-                 pendingFocusId.current =  insertBlockAfter(block.id, "text");
-                  
+                  pendingFocusId.current = insertBlockAfter(block.id, "text");
+
                   setOpenMenu(null);
                 }}
                 onClick_heading1={() => {
                   block.content === ""
-                    ? pendingFocusId.current =  changeBlockType(block.id, "heading1")
-                    : pendingFocusId.current =  insertBlockAfter(block.id, "heading1");
-                  
+                    ? (pendingFocusId.current = changeBlockType(
+                        block.id,
+                        "heading1",
+                      ))
+                    : (pendingFocusId.current = insertBlockAfter(
+                        block.id,
+                        "heading1",
+                      ));
+
                   setOpenMenu(null);
                 }}
                 onClick_heading2={() => {
                   block.content === ""
-                    ? pendingFocusId.current =  changeBlockType(block.id, "heading2")
-                    : pendingFocusId.current =  insertBlockAfter(block.id, "heading2");
-                  
+                    ? (pendingFocusId.current = changeBlockType(
+                        block.id,
+                        "heading2",
+                      ))
+                    : (pendingFocusId.current = insertBlockAfter(
+                        block.id,
+                        "heading2",
+                      ));
+
                   setOpenMenu(null);
                 }}
                 onClick_bulletlist={() => {
                   block.content === ""
-                    ? pendingFocusId.current =  changeBlockType(block.id, "bullet-list")
-                    : pendingFocusId.current =  insertBlockAfter(block.id, "bullet-list");
-                  
+                    ? (pendingFocusId.current = changeBlockType(
+                        block.id,
+                        "bullet-list",
+                      ))
+                    : (pendingFocusId.current = insertBlockAfter(
+                        block.id,
+                        "bullet-list",
+                      ));
+
                   setOpenMenu(null);
                 }}
               />

@@ -6,7 +6,7 @@ import { Block } from "./useEditorZen";
 
 type BlockMenuProps = {
   block: Block; 
-  type: "add" | "more" | "drag";
+  openMenuProp: {blockId: string, type : null | 'add' | 'more'} | null
   onClose: () => void;
   blockMenuRef: React.RefObject<HTMLDivElement>;
   onClick_text: () => void;
@@ -17,7 +17,7 @@ type BlockMenuProps = {
 
 const BlockMenu = ({
   block,
-  type,
+  openMenuProp,
   onClose,
   blockMenuRef,
   onClick_text,
@@ -28,7 +28,7 @@ const BlockMenu = ({
   const [blockTypeMenuToggle, setBlockTypeMenuToggle] = useState(false);
   const [textColorMenuToggle, setTextColorMenuToggle] = useState(false);
 
-  if (type === "add") {
+  if (openMenuProp?.type === "add") {
     return (
       <div
         ref={blockMenuRef}
@@ -82,7 +82,7 @@ const BlockMenu = ({
       </div>
     );
   }
-  if (type === "more") {
+  if (openMenuProp?.type === "more") {
   return (
     <div
       ref={blockMenuRef}

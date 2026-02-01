@@ -38,19 +38,25 @@
             }
         }
         .editor-block-content{
+          line-height: 1.8;
+
             height: 30px;
             width: 100%;
             outline: none;
         }
         .editor-block-content[data-type="heading1"] {
-            height: 60px;
-  font-size: 50px;
+          line-height: 1;
+
+            height: 40px;
+  font-size: 40px;
   font-weight: 900;
 }
 
 .editor-block-content[data-type="heading2"] {
-    height: 40px;
-  font-size: 30px;
+  line-height: 1;
+
+    height: 32px;
+  font-size: 32px;
   font-weight: 700;
 }
 
