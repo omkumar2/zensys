@@ -2,11 +2,15 @@ import { create } from "zustand";
 import { BlockType } from "@/types/editor";
 import { Block } from "@/types/editor";
 import { convertToMD } from "@/helper/convertToMD";
-import { MemoryItem } from "@/memory/schema";
+import { MemoryItem, MemoryNode } from "@/memory/schema";
 
 type OpenMenu = {
   blockId: string;
   type: "add" | "more";
+} | null;
+
+type Memory = {
+  mI:MemoryItem; selectedMN: MemoryNode;
 } | null;
 
 type EditorState = {
@@ -14,8 +18,8 @@ type EditorState = {
   blocks: Block[];
   openMenu: OpenMenu;
   
-  memoryItem: MemoryItem | null;
-  setMemoryItem: (mI: MemoryItem)=>void
+  memory: Memory
+  setMemory: (  m: Memory ) => void
 
   /* ---------- UI ---------- */
   setOpenMenu: (menu: OpenMenu) => void;
@@ -39,10 +43,10 @@ export const useEditorZen = create<EditorState>((set, get) => ({
     },
   ],
   openMenu: null,
-  memoryItem: null
+  memory: null
 , 
-setMemoryItem:(mI)=>set({
-  memoryItem:mI
+setMemory:(mI)=>set({
+  memory:mI
 }),
  onClickBlockMenuItem: (block, changeToType) => {
     let returnId: string;

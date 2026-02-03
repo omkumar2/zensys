@@ -8,8 +8,8 @@ const Workspace =()=> {
     const ActiveTabComponent = activeTab ? TAB_COMPONENTS[activeTab.type] : null;
     return (
         <div className="workspace">    
-            {/* {ActiveTabComponent && <ActiveTabComponent />} */}
-            <Editor />
+            {ActiveTabComponent && <ActiveTabComponent />}
+            {/* <Editor /> */}
         </div>
     )
 }

@@ -2,7 +2,7 @@ import { v7 } from "uuid";
 import { MemoryNode, MemoryType } from "@/memory/schema";
 import { invoke } from "@tauri-apps/api/core";
 export const MemoryNodeService = () => {
-  const createMemoryNode = (
+  const createMemoryNode = async (
     memory_id: string,
     title: string,
     memory_type: MemoryType,
@@ -22,6 +22,11 @@ export const MemoryNodeService = () => {
       created_at: new Date().toISOString(),
       change_reason: comment,
     };
+
+    await invoke("save_memory_node", {
+                  memoryNode: newMemoryNode,
+                });
+
     return newMemoryNode;
   };
   const loadMemoryNode = async (memory_id: string) => {

@@ -1,19 +1,27 @@
-import { selectedMemoryType } from '@/memory/schema'
-// import Editor from '@/components/editor/editor'
+import { selectedMemory } from '@/memory/schema'
+import { useActiveTab } from '@/hooks/useActiveTab'
+import { useEditorZen } from '@/editor/useEditorZen'
 import './memory_space_item.scss'
-import { useState } from 'react'
 
 type MemorySpaceItemProps = {
-    memory: selectedMemoryType
+    memory: selectedMemory
 }
 
 const MemorySpaceItem = ({ memory }: MemorySpaceItemProps) => {
 
-const [editable, setEditable] = useState(false);
+// const [editable, setEditable] = useState(false);
+const {switchActiveTab} =useActiveTab();
+const { setMemory} = useEditorZen();
   const { active_node: activeNode,  } = memory;
   return (
-    <article className="memory-node">
+    <article className="memory-node"
+    onClick={()=>{
+      {memory && setMemory({mI: memory.memory_item, selectedMN: memory.active_node})}
+      switchActiveTab('editor')
 
+    }}
+    >
+      <button className='memory-node-edit-btn'>Edit</button>
       <header className="memory-node__header">
         <h1 className="memory-node__title">
           {activeNode.title}
@@ -25,9 +33,10 @@ const [editable, setEditable] = useState(false);
       </header>
 
       <section className="memory-node__content" 
-      onClick={()=>setEditable(true)}>
+      // onClick={()=>{}}
+      >
         {/* <Editor content={activeNode.content} editable={editable}></Editor> */}
-        {activeNode.content}
+        {activeNode.content_string}
       </section>
 
     </article>

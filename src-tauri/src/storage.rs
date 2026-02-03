@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::{utils::get_app_dir, schema::{MemoryNode, MemoryItem}};
 use tauri::{AppHandle,
     //  Manager,
@@ -7,11 +9,11 @@ use tauri::{AppHandle,
 
 /// fn to create memory_spaces directory
 #[command]
-pub fn create_memory_spaces_dir(app:AppHandle) -> Result<(), String>{
+pub fn create_memory_spaces_dir(app:AppHandle) -> Result<PathBuf, String>{
     let app_dir = get_app_dir(app)?;
     let memory_spaces_dir = app_dir.join("memory_spaces");
     std::fs::create_dir_all(&memory_spaces_dir).map_err(|err| format!("Can not create memory_spaces_dir: {}", err))?;
-    Ok(())
+    Ok(memory_spaces_dir)
 }
 
 /// fn to save a memory item
@@ -52,9 +54,24 @@ pub fn save_memory_node(app:AppHandle, memory_node:MemoryNode)-> Result<(),Strin
     std::fs::create_dir_all(&nodes_dir).map_err(|e| format!("Cannot create nodes_dir: {}",e))?;
 
     let json = serde_json::to_string_pretty(&memory_node).map_err(|e| format!("Cannot serialize memory node: {}", e))?;
+
+    let content_json = serde_json::to_string_pretty(&memory_node.content_json).map_err(|e| format!("Cannot serialize memory node content"))?;
+
+    let tmp_content_md_path = nodes_dir.join("content.md.tmp");
+    let final_content_md_path = nodes_dir.join("content.mc");
+
+    let tmp_content_json_path = nodes_dir.join("content.json.tmp");
+    let final_content_json_path = nodes_dir.join("content.json");
     
     let tmp_path = nodes_dir.join("metadata.json.tmp");
     let final_path = nodes_dir.join("metadata.json");
+
+    std::fs::write(&tmp_content_json_path, content_json).map_err(|e| format!("Cannot write temp content json: {}",e))?;
+    std::fs::rename(&tmp_content_json_path, &final_content_json_path).map_err(|e| format!("Cannot finalize node content_json: {}",e))?;
+
+    std::fs::write(&tmp_content_md_path, memory_node.content_string).map_err(|e| format!("Cannot write temp content_md: {}", e))?;
+    std::fs::rename(&tmp_content_md_path, &final_content_md_path
+    ).map_err(|e| format!("Cannot finalize node content_md: {}",e))?;
 
     std::fs::write(&tmp_path, json).map_err(|e| format!("Cannot write temp node file: {}", e))?;
     std::fs::rename(&tmp_path, &final_path).map_err(|e| format!("Cannot finalize node write: {}", e))?;
@@ -179,4 +196,55 @@ pub fn load_all_memory_nodes_of_memory_item(
     }
 
     Ok(memory_nodes)
+}
+
+
+#[command]
+pub fn set_active_node_id_of_memory_item(
+    app: AppHandle,
+    memory_id: String,
+    node_id: String,
+) -> Result<(), String> {
+    let memory_spaces_dir = create_memory_spaces_dir(app)?;
+
+    let memory_dir = memory_spaces_dir.join(&memory_id);
+    if !memory_dir.exists() {
+        return Err(format!("Memory '{}' does not exist", memory_id));
+    }
+
+    // 1. Validate node existence
+    let node_dir = memory_dir.join("nodes").join(&node_id);
+    if !node_dir.exists() {
+        return Err(format!(
+            "Node '{}' does not exist in memory '{}'",
+            node_id, memory_id
+        ));
+    }
+
+    // 2. Load metadata.json
+    let metadata_path = memory_dir.join("metadata.json");
+    if !metadata_path.exists() {
+        return Err(format!(
+            "metadata.json not found for memory '{}'",
+            memory_id
+        ));
+    }
+
+    let metadata_raw = std::fs::read_to_string(&metadata_path)
+        .map_err(|e| format!("Failed to read metadata.json: {}", e))?;
+
+    let mut metadata: MemoryItem = serde_json::from_str(&metadata_raw)
+        .map_err(|e| format!("Invalid metadata.json: {}", e))?;
+
+    // 3. Mutate
+    metadata.active_node_id = node_id;
+
+    // 4. Persist (pretty + deterministic)
+    let updated = serde_json::to_string_pretty(&metadata)
+        .map_err(|e| format!("Failed to serialize metadata: {}", e))?;
+
+    std::fs::write(&metadata_path, updated)
+        .map_err(|e| format!("Failed to write metadata.json: {}", e))?;
+
+    Ok(())
 }

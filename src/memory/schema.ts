@@ -19,7 +19,7 @@ export type MemoryNode = {
   change_reason?: string
 }
 
-export type selectedMemoryType = {
+export type selectedMemory = {
   memory_item: MemoryItem
   active_node: MemoryNode
   nodes: MemoryNode[]

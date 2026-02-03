@@ -15,6 +15,7 @@ pub fn run() {
             storage::load_all_memory_items,
             storage::load_active_memory_node_of_memory_item,
             storage::load_all_memory_nodes_of_memory_item,
+            storage::set_active_node_id_of_memory_item,
             tag::create_tags_dir,
             tag::save_tag,
             tag::load_all_tags,

@@ -3,10 +3,13 @@ import { useEffect, useRef } from "react";
 import BlockMenu from "./blockMenu";
 import { useEditorZen } from "./useEditorZen";
 import { focusEnd } from "@/helper/focusEl";
+import { MemoryNodeService } from "@/service/memoryNodeService";
+import { MemoryItemService } from "@/service/memoryItemService";
 
 const Editor = () => {
   const pendingFocusId = useRef<string | null>(null);
   const {
+    memory,
     blocks,
     openMenu,
     setOpenMenu,
@@ -14,15 +17,17 @@ const Editor = () => {
     changeBlockType,
     deleteBlock,
     updateBlockContent,
-    onClickBlockMenuItem
+    onClickBlockMenuItem,
+    onSave,
   } = useEditorZen();
+  const { createMemoryNode } = MemoryNodeService();
+  const {setActiveNodeIdOfMemoryItem} =MemoryItemService();
   const blockRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const blockMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    
     if (!pendingFocusId.current) return;
-    console.log("getting el")
+    console.log("getting el");
     const el = blockRefs.current.get(pendingFocusId.current);
     if (el) {
       focusEnd(el);
@@ -48,7 +53,28 @@ const Editor = () => {
 
   return (
     <div className="editor">
-      <button className="editor-save-btn">
+      <button
+        className="editor-save-btn"
+        onClick={async () => {
+          if (memory === null) return
+          const { blocks: Blocks, content } = onSave(blocks);
+          
+          
+             {
+              const newMemoryNode = await createMemoryNode(
+                memory.mI.memory_id,
+                memory.selectedMN.title,
+                memory.selectedMN.memory_type,
+                Blocks,
+                content,
+                "",
+                memory.selectedMN.node_id,
+              ) 
+              setActiveNodeIdOfMemoryItem(memory.mI.memory_id, newMemoryNode.node_id)
+            }
+          
+        }}
+      >
         Save
       </button>
       <div className="editable-content">
@@ -63,7 +89,7 @@ const Editor = () => {
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpenMenu({blockId: block.id, type: 'add'});
+                  setOpenMenu({ blockId: block.id, type: "add" });
                 }}
               >
                 +
@@ -74,7 +100,7 @@ const Editor = () => {
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setOpenMenu({blockId: block.id , type: 'more'});
+                  setOpenMenu({ blockId: block.id, type: "more" });
                 }}
               >
                 ⋮⋮
@@ -125,13 +151,13 @@ const Editor = () => {
                 openMenuProp={openMenu}
                 blockMenuRef={blockMenuRef as React.RefObject<HTMLDivElement>}
                 onClose={() => setOpenMenu(null)}
-                onClick_BlockMenuItem={(changeToType)=>{
-                  
-                  pendingFocusId.current = onClickBlockMenuItem(block,changeToType )
-                  console.log(`pending focus id: ${pendingFocusId.current} `)
+                onClick_BlockMenuItem={(changeToType) => {
+                  pendingFocusId.current = onClickBlockMenuItem(
+                    block,
+                    changeToType,
+                  );
+                  console.log(`pending focus id: ${pendingFocusId.current} `);
                 }}
-                
-                
               />
             )}
           </div>

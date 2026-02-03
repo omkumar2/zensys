@@ -1,3 +1,4 @@
+import Editor from "@/editor/editor"
 import Create from "@/workspace/create/create"
 import MemorySpace from "@/workspace/memory_space/memory_space"
 import Overview from "@/workspace/overview/overview"
@@ -9,6 +10,7 @@ export type TabType =
   | "create"
   | "structure"
   | "settings"
+  | 'editor'
 
 export type TimelineState = {
   stateTimeId: number
@@ -26,6 +28,7 @@ export type TabItem = {
 export type TabStore = {
   tabs: TabItem[]
   activeTabId: string
+  setActiveTabId: (id:string)=>void
   switchTab: (id: string, type: TabType) => void
 }
 
@@ -36,4 +39,5 @@ export const TAB_COMPONENTS: Record<TabType, React.ComponentType> = {
   create: Create,
   structure: Structure,
   settings: Settings,
+  editor: Editor,
 }

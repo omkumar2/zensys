@@ -4,17 +4,23 @@ import { MemoryNodeService } from "./memoryNodeService";
 import { invoke } from "@tauri-apps/api/core";
 export const MemoryItemService = () => {
     const {createMemoryNode, loadMemoryNode } = MemoryNodeService();
-    const createMemoryItem = (title: string, type:MemoryType) => {
+    const createMemoryItem = async (title: string, type:MemoryType) => {
         const newMemoryItem: MemoryItem = {
             memory_id: v7(),
             created_at: new Date().toISOString(),
             active_node_id: "",
         }
-        const memoryNode = createMemoryNode(newMemoryItem.memory_id, title, type,null,'',"Initial creation", undefined);
+        await invoke("save_memory_item", {
+                  memoryItem: newMemoryItem,
+                });
+        const memoryNode = await createMemoryNode(newMemoryItem.memory_id, title, type,null,'',"Initial creation", undefined);
         const memoryItem: MemoryItem = {
             ...newMemoryItem,
             active_node_id: memoryNode.node_id,
         }
+
+                
+                
         return {memoryItem, memoryNode};
     }
     const loadAllMemoryItems = async (
@@ -33,5 +39,9 @@ export const MemoryItemService = () => {
     const deleteMemoryItem = () => {
         return
     }
-    return { createMemoryItem, deleteMemoryItem, loadAllMemoryItems };
+    const setActiveNodeIdOfMemoryItem = async (memory_id: string, node_id: string) => {
+
+       await invoke("set_active_node_id_of_memory_item", {memoryId: memory_id, nodeId: node_id})
+    }
+    return { createMemoryItem, deleteMemoryItem, loadAllMemoryItems, setActiveNodeIdOfMemoryItem };
 }

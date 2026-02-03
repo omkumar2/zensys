@@ -13,6 +13,10 @@ export const useTabStore = create<TabStore>((set) => ({
   ],
   activeTabId: "tab-1",
 
+  setActiveTabId:(id)=>set({
+    activeTabId: id
+  }),
+
   switchTab: (id, type) =>
     set((state) => {
       let t = state.tabs.find((tab) => tab.id === id);

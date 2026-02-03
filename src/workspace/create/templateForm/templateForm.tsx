@@ -53,18 +53,12 @@ const TemplateForm = ({ selectedTemplate }: TemplateFormProps) => {
             className="primary"
             disabled={!title.trim()}
             onClick={async () => {
-              const { memoryItem, memoryNode } = createMemoryItem(
-                title as string,
-                type,
-              );
               try {
-                await invoke("save_memory_item", {
-                  memoryItem: memoryItem,
-                });
-
-                await invoke("save_memory_node", {
-                  memoryNode: memoryNode,
-                });
+                await createMemoryItem(
+                  title as string,
+                  type,
+                );
+                
               } catch (err) {
                 console.error("Failed to save memory:", err);
               }
