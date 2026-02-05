@@ -18,6 +18,7 @@ active_node_id: initial_node_id
             memory_id,
             created_at: new Date().toISOString(),
             content_json: '',
+            tags: []
         }
         await invoke("create_memory_item_with_initial_node",{
             memoryItem:memoryItem,
@@ -37,7 +38,8 @@ active_node_id: initial_node_id
             created_at: new Date().toISOString(),
             content_json,
             // content_string,
-            memory_type: type
+            memory_type: type,
+            tags: []
         }
         await invoke("add_new_node_to_existing_memory_item", {
             memoryItem:memoryItem,
