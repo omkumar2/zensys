@@ -3,14 +3,14 @@ import { useEffect, useRef } from "react";
 import BlockMenu from "./blockMenu";
 import { useEditorZen } from "./useEditorZen";
 import { focusEnd } from "@/helper/focusEl";
-import { MemoryNodeService } from "@/service/memoryNodeService";
+// import { MemoryNodeService } from "@/service/memoryNodeService";
 import { MemoryItemService } from "@/service/memoryItemService";
 import { useActiveTab } from "@/hooks/useActiveTab";
+import { useMemoryStore } from "@/store/useMemoryStore";
 
 const Editor = () => {
   const pendingFocusId = useRef<string | null>(null);
   const {
-    memory,
     blocks,
     openMenu,
     setOpenMenu,
@@ -21,7 +21,8 @@ const Editor = () => {
     onClickBlockMenuItem,
     onSave,
   } = useEditorZen();
-  const { switchActiveTab } = useActiveTab();
+  const {memory ,reloadMemory} = useMemoryStore();
+  const { setActiveTabTypeAndView } = useActiveTab();
   const {addNewNodeToExistingMemoryItem} = MemoryItemService();
   // const { createMemoryNode } = MemoryNodeService();
   const {setActiveNodeIdOfMemoryItem} =MemoryItemService();
@@ -66,12 +67,13 @@ const Editor = () => {
           
           
              {
-               await addNewNodeToExistingMemoryItem(memory.mI,
-                memory.selectedMN.title,
-                memory.selectedMN.memory_type,JSON.stringify(Blocks,null,2)
+               await addNewNodeToExistingMemoryItem(memory.memoryItem,
+                memory.activeNode.title,
+                memory.activeNode.memory_type,JSON.stringify(Blocks,null,2)
               )
-  
-              switchActiveTab('memory_space')
+               await reloadMemory(memory.memoryItem.memory_id)
+              // console.log(memoryItem,activeNode,nodes );
+              setActiveTabTypeAndView('memory_space','detail')
             }
           
         }}
