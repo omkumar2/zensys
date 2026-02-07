@@ -36,9 +36,18 @@ export const useTags = () => {
     await invoke("delete_tag", { tagId });
   }
 
+  const addTagToNode = async (memoryId:string,nodeId:string,tag:Tag) => {
+    try{
+
+      await invoke("upsert_tag_on_node",{memoryId,nodeId,tag:tag})
+      return{ok:true}
+    } catch (err){
+      return {ok:false, error: String(err)}
+    }
+  }
   useEffect(() => {
     loadTags();
   }, [loadTags]);
 
-  return { tags, loading, error, saveTag, updateTag, reload: loadTags, removeTag: deleteTag };
+  return { tags, loading, error, saveTag, updateTag, reload: loadTags, removeTag: deleteTag, addTagToNode };
 };

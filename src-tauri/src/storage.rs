@@ -554,11 +554,11 @@ pub fn add_new_node_to_existing_memory_item(
 
 
 #[command]
-pub fn add_tags_to_node(
+pub fn upsert_tag_on_node(
     app: AppHandle,
     memory_id: String,
     node_id: String,
-    new_tags: Vec<Tag>,
+    tag: Tag,
 ) -> Result<(), String> {
     use std::fs;
 
@@ -568,42 +568,40 @@ pub fn add_tags_to_node(
         .join("nodes")
         .join(&node_id);
 
-    if !node_dir.exists() {
-        return Err(format!("Memory node {} does not exist", node_id));
+    if !node_dir.is_dir() {
+        return Err(format!("Memory node '{}' does not exist", node_id));
     }
 
-    let node_json_path = node_dir.join("metadata.json");
-    let tmp_node_json_path = node_dir.join("metadata.tmp.json");
+    let metadata_path = node_dir.join("metadata.json");
+    let tmp_metadata_path = node_dir.join("metadata.json.tmp");
 
-    let raw = fs::read_to_string(&node_json_path)
-        .map_err(|e| format!("Failed to read metadata.json: {}", e))?;
+    let raw = fs::read_to_string(&metadata_path)
+        .map_err(|e| format!("Failed to read node metadata: {}", e))?;
 
     let mut node: MemoryNode = serde_json::from_str(&raw)
-        .map_err(|e| format!("Failed to deserialize metadata.json: {}", e))?;
+        .map_err(|e| format!("Failed to parse node metadata: {}", e))?;
 
-    // 🔒 enforce identity by id
-    for tag in new_tags {
-        match node.tags.iter_mut().find(|t| t.id == tag.id) {
-            Some(existing) => {
-                *existing = tag; // update
-            }
-            None => {
-                node.tags.push(tag); // insert
-            }
+    match node.tags.iter_mut().find(|t| t.id == tag.id) {
+        Some(existing) => {
+            *existing = tag; // update in place
+        }
+        None => {
+            node.tags.push(tag); // insert
         }
     }
 
     let serialized = serde_json::to_string_pretty(&node)
-        .map_err(|e| format!("Failed to serialize node: {}", e))?;
+        .map_err(|e| format!("Failed to serialize node metadata: {}", e))?;
 
-    fs::write(&tmp_node_json_path, serialized)
+    fs::write(&tmp_metadata_path, serialized)
         .map_err(|e| format!("Failed to write temp metadata: {}", e))?;
 
-    fs::rename(&tmp_node_json_path, &node_json_path)
-        .map_err(|e| format!("Failed to replace metadata.json: {}", e))?;
+    fs::rename(&tmp_metadata_path, &metadata_path)
+        .map_err(|e| format!("Failed to atomically replace metadata: {}", e))?;
 
     Ok(())
 }
+
 
 
 #[command]

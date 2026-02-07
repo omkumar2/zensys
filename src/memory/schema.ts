@@ -19,7 +19,7 @@ export type MemoryNode = {
   title: string
   memory_type: MemoryType
   change_reason?: string
-  tags?: Tag[]
+  tags: Tag[]
 }
 
 export type selectedMemory = {
