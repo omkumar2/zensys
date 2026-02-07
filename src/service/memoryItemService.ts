@@ -1,6 +1,7 @@
 import { v7 } from "uuid";
 import { MemoryItem, MemoryNode, MemoryType } from "@/memory/schema";
 import { invoke } from "@tauri-apps/api/core";
+import { createBlock } from "@/helper/createBlock";
 export const MemoryItemService = () => {
   const createMemoryItem = async (title: string, type: MemoryType) => {
     const memory_id = v7();
@@ -16,7 +17,7 @@ export const MemoryItemService = () => {
       memory_type: type,
       memory_id,
       created_at: new Date().toISOString(),
-      content_json: "",
+      content_json: JSON.stringify([createBlock('paragraph')]),
       tags: [],
     };
     await invoke("create_memory_item_with_initial_node", {

@@ -1,129 +1,126 @@
 import { create } from "zustand";
-import { BlockType } from "@/types/editor";
-import { Block } from "@/types/editor";
-import { convertToMD } from "@/helper/convertToMD";
+import type { AnyBlock, Block, BlockType } from "@/types/editor";
+import { createBlock } from "@/helper/createBlock";
+import { widenBlock } from "@/helper/widenBlock";
 
 
 type OpenMenu = {
   blockId: string;
-  type: "add" | "more";
+  mode: "add" | "more";
 } | null;
-
-
 
 type EditorState = {
   /* ---------- STATE ---------- */
   blocks: Block[];
+  setBlocks: (b:Block[]) => void
+  editable: boolean
+  setEditable: (v: boolean) =>void
   openMenu: OpenMenu;
-  
-
-
 
   /* ---------- UI ---------- */
   setOpenMenu: (menu: OpenMenu) => void;
-  onClickBlockMenuItem: (block: Block, changeToType: BlockType) => string;
 
-  /* ---------- BLOCK ACTIONS ---------- */
-  insertBlockAfter: (afterId: string, type: BlockType) => string;
-  changeBlockType: (id: string, type: BlockType) => string;
+  /* ---------- BLOCK OPS ---------- */
+  insertBlockAfter: <T extends BlockType>(
+    afterId: string,
+    type: T
+  ) => string;
+
+  replaceBlock: <T extends BlockType>(
+    id: string,
+    type: T
+  ) => string;
+
   deleteBlock: (id: string) => string;
-  updateBlockContent: (id: string, content: string) => string;
-  onSave: (blocks: Block[]) => {blocks: Block[], content:string};
+
+  updateBlockContent: <T extends BlockType>(
+    id: string,
+    content: Block<T>["content"]
+  ) => void;
+
+  updateBlockMeta: <T extends BlockType>(
+    id: string,
+    meta: Partial<Block<T>["meta"]>
+  ) => void;
+
+  onSave: () => { blocks: Block[] };
 };
+
+
 
 export const useEditorZen = create<EditorState>((set, get) => ({
   /* ---------- INITIAL STATE ---------- */
-  blocks: [
-    {
-      id: crypto.randomUUID(),
-      content: "",
-      type: 'text',
-    },
-  ],
+  blocks: [createBlock("paragraph")],
+  setBlocks: (b)=>set({
+    blocks:b
+  }),
+  editable: false,
+  setEditable: (v)=> set({editable:v}),
+
   openMenu: null,
-
- onClickBlockMenuItem: (block, changeToType) => {
-    let returnId: string;
-    block.content === ""
-      ? (returnId = get().changeBlockType(block.id, changeToType))
-      : (returnId = get().insertBlockAfter(block.id, changeToType));
-
-    get().setOpenMenu(null);
-    return returnId;
-  },
 
   /* ---------- UI ---------- */
   setOpenMenu: (openMenu) => set({ openMenu }),
 
-  /* ---------- BLOCK ACTIONS ---------- */
+  /* ---------- BLOCK OPS ---------- */
 
   insertBlockAfter: (afterId, type) => {
-  const newId = crypto.randomUUID();
+    
+    const newBlock = widenBlock(createBlock(type))
 
-  const nextType =
-    type === "heading1" ||
-    type === "heading2" ||
-    type === "heading3"
-      ? "text"
-      : type;
+    set((state) => {
+      const index = state.blocks.findIndex((b) => b.id === afterId);
+      if (index === -1) return state;
 
-  set((state) => {
-    const index = state.blocks.findIndex((b) => b.id === afterId);
-    if (index === -1) return state;
-
-    const next = [...state.blocks];
-    next.splice(index + 1, 0, {
-      id: newId,
-      content: "",
-      type: nextType,
+      const blocks = [...state.blocks];
+      blocks.splice(index + 1, 0, newBlock);
+      return { blocks };
     });
 
-    return { blocks: next };
-  });
-
-  return newId;
-},
-
-  changeBlockType: (id, type) => {
-    set((state) => ({
-      blocks: state.blocks.map((b) => (b.id === id ? { ...b, type } : b)),
-    }));
-    return id;
+    return newBlock.id;
   },
 
-  deleteBlock: (id: string): string => {
-    const { blocks } = get();
+  replaceBlock: (id, type) => {
+    const newBlock = widenBlock(createBlock(type));
 
+    set((state) => ({
+      blocks: state.blocks.map((b) => (b.id === id ? newBlock : b)),
+    }));
+
+    return newBlock.id;
+  },
+
+  deleteBlock: (id) => {
+    const { blocks } = get();
     if (blocks.length === 1) return "";
 
     const index = blocks.findIndex((b) => b.id === id);
     if (index === -1) return "";
 
-    const prevId =
-      index > 0 ? blocks[index - 1].id : (blocks[index + 1]?.id ?? "");
+    const focusId =
+      index > 0 ? blocks[index - 1].id : blocks[index + 1]?.id ?? "";
 
-    set({
-      blocks: blocks.filter((b) => b.id !== id),
-    });
-
-    return prevId as string;
+    set({ blocks: blocks.filter((b) => b.id !== id) });
+    return focusId;
   },
 
   updateBlockContent: (id, content) => {
     set((state) => ({
-      blocks: state.blocks.map((b) => (b.id === id ? { ...b, content } : b)),
+      blocks: state.blocks.map((b) =>
+        b.id === id ? { ...b, content } : b
+      ),
     }));
-    return id;
   },
-  onSave: (blocks) => {
-    // const content_json = blocks
-  const content = blocks
-    .map((block, i) => convertToMD(block, i))
-    .join("\n\n");
-    return{
-      blocks,
-      content,
-    }
-  // persist content somewhere
-}
+
+  updateBlockMeta: (id, meta) => {
+    set((state) => ({
+      blocks: state.blocks.map((b) =>
+        b.id === id
+          ? { ...b, meta: { ...b.meta, ...meta } }
+          : b
+      ),
+    }));
+  },
+
+  onSave: () => ({ blocks: get().blocks }),
 }));
