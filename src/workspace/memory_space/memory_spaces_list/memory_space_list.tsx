@@ -1,38 +1,39 @@
 import { useMemory } from "@/hooks/useMemory";
 import "./memory_space_list.scss";
-import { MemoryItem, MemoryNode } from "@/memory/schema";
-import { useEffect, useState } from "react";
-type MemoryItemWithActiveNode = {
-  item: MemoryItem;
-  active_node: MemoryNode;
-};
-type memorySpaceListProps = {
-  onSelect: (memory: MemoryItemWithActiveNode) => void;
-};
-const MemorySpaceList = ({ onSelect }: memorySpaceListProps) => {
-  const {loadAllMemoryItems} =useMemory()
+// import { MemoryItem, MemoryNode } from "@/memory/schema";
+import {  useEffect,useState } from "react";
+import { useActiveTab } from "@/hooks/useActiveTab";
 
-  const [memoryItems, setMemoryItems] = useState<MemoryItemWithActiveNode[]>(
-    [],
-  );
+const MemorySpaceList = () => {
+  const {memoryData, memoryActions} =useMemory()
+  const {setActiveTabTypeAndView} =useActiveTab();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchMemoryItems = async () => {
-      try {
-        const data = await loadAllMemoryItems();
-        setMemoryItems(data);
-      } catch (err) {
-        setError(String(err));
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+  let cancelled = false;
 
-    fetchMemoryItems();
-  }, [loadAllMemoryItems]);
+  setLoading(true);
+  (async()=>{
+
+    await memoryActions.memories
+    .load()
+    .catch(err => {
+      if (!cancelled) setError(String(err));
+    })
+    .finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+  })()
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
+
+
+console.log(memoryData.memories)  
 
   if (loading) {
     return <div className="memory-space-list">Loading…</div>;
@@ -41,17 +42,20 @@ const MemorySpaceList = ({ onSelect }: memorySpaceListProps) => {
   if (error) {
     return <div className="memory-space-list error">{error}</div>;
   }
-
+  if (memoryData.memories.length === 0) return
   return (
     <div className="memory-space-list">
       <h1>Memory Space</h1>
 
       <div className="memory-space-list-items">
-        {memoryItems.map(({ item, active_node }) => (
+        {memoryData.memories.map(({memory_item:item , active_node: active_node,nodes }) => (
           <div
             key={item.memory_id}
             className="memory-space-list-item"
-            onClick={() => onSelect({ item, active_node })}
+            onClick={()=>{
+              memoryActions.memory.set({memory_item:item,active_node:active_node,nodes})
+              setActiveTabTypeAndView('memory_space','detail')
+            }}
           >
             <h2>{active_node?.title}</h2>
           </div>
