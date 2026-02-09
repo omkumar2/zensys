@@ -6,3 +6,11 @@ export function widenBlock<T extends BlockType>(
 ): AnyBlock {
   return block as AnyBlock;
 }
+
+
+
+export function widenBlocks<T extends BlockType>(
+  blocks: Block<T>[]
+): AnyBlock[] {
+  return blocks.map(widenBlock);
+}
