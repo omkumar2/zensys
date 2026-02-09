@@ -5,18 +5,18 @@ import { useEffect, useRef, useState } from "react";
 import Editor from "@/editor/editor";
 import { toast } from "sonner";
 import { useEditorZen } from "@/hooks/useEditorZen";
-import { Block } from "@/types/editor";
+import { AnyBlock, Block } from "@/types/editor";
 import { useMemory } from "@/hooks/useMemory";
-
+import { areBlocksSemanticallyEqual } from "@/helper/compareTwoBlocks";
+import { widenBlocks } from "@/helper/widenBlock";
 
 const MemorySpaceItem = () => {
-  // const [editable, setEditable] = useState(false);
-  const {memoryActions,memory} =useMemory();
+  const { memoryActions, memoryData } = useMemory();
   const { setActiveTabView } = useActiveTab();
   const { tagsData, addTagToNode } = useTags();
+  const { active_node: activeNode } = memoryData.memory.new;
   const [showTagPicker, setShowTagPicker] = useState<boolean>(false);
-  const { activeNode } = memory;
-  const { blocks,  editable, editableActions, blockActions } = useEditorZen();
+  const { blocks, editable, editableActions, blockActions } = useEditorZen();
   const tagPickerRef = useRef<HTMLDivElement>(null);
 
   const nodeTagIds = new Set(activeNode.tags.map((t) => t.id));
@@ -25,8 +25,6 @@ const MemorySpaceItem = () => {
 
   useEffect(() => {
     const b: Block[] = JSON.parse(activeNode.content_json);
-    console.log(activeNode.content_json);
-    console.log(b);
     blockActions.set(b);
     const handleTagPicker = (e: MouseEvent) => {
       if (
@@ -41,14 +39,14 @@ const MemorySpaceItem = () => {
 
   const saveNode = async () => {
     await memoryActions.memoryItem.addNode(
-      memory.memoryItem,
+      memoryData.memory.new.memory_item,
       activeNode.title,
       activeNode.memory_type,
       JSON.stringify(blocks),
     );
 
     await memoryActions.memory.reload(activeNode.memory_id);
-    editableActions.disable()
+    editableActions.disable();
   };
 
   const deleteAndExit = async () => {
@@ -71,16 +69,7 @@ const MemorySpaceItem = () => {
             onClick={(e) => {
               e.stopPropagation();
               // e.preventDefault();
-              if (memory) {
-                memoryActions.memory.set({
-                  memoryItem: memory.memoryItem,
-                  activeNode: memory.activeNode,
-                  nodes: memory.nodes,
-                });
-              }
-              editableActions.enable()
-              console.log('clicked edit')
-              // setActiveTabView("editor");
+              editableActions.enable();
             }}
           >
             <svg
@@ -100,6 +89,20 @@ const MemorySpaceItem = () => {
           <button
             className="memory-node-save-btn"
             onClick={async () => {
+              const oldBlocks: AnyBlock[] = JSON.parse(
+                memoryData.memory.new.active_node.content_json,
+              );
+              const bool = areBlocksSemanticallyEqual(
+                oldBlocks,
+                widenBlocks(blocks),
+              );
+              if (bool) {
+                editableActions.disable();
+                toast.warning(
+                  "The content is still same, please change something",
+                );
+                return;
+              }
               toast.promise(saveNode(), {
                 loading: "Saving node",
                 success: "Node saved successfully",
