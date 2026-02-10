@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./blockMenu.scss";
-// import BlockTypeMenu from "./blockTypeMenu";
+import BlockTypeMenu from "./blockTypeMenu";
 // import TextColorMenu from "./textColorMenu";
 import { BlockType } from "@/types/editor";
 import { BLOCK_ITEMS } from "@/constants/editor";
@@ -9,6 +9,7 @@ import type { AnyBlock } from "@/types/editor";
 type BlockMenuMode = "add" | "more";
 
 type BlockMenuProps = {
+  blockMenuRef : React.RefObject<HTMLDivElement>;
   block: AnyBlock;
   mode: BlockMenuMode;
   onClose: () => void;
@@ -17,21 +18,23 @@ type BlockMenuProps = {
     | "bullet-list"
     | "number-list"
     | "todo" ) => void;
-  onChangeBlockType: (type: BlockType) => void;
+  onChangeBlockType: (b:AnyBlock) => void;
 };
 
 const BlockMenu = ({
+  blockMenuRef,
   block,
   mode,
   onClose,
   onAddBlock,
-  // onChangeBlockType,
+  onChangeBlockType,
 }: BlockMenuProps) => {
-  const [activeTab, setActiveTab] = useState<"change" | "color">("change");
+  const [activeMenuType, setActiveMenuType] = useState<"change" | "color">(null);
 
   if (mode === "add") {
     return (
       <div
+      ref={blockMenuRef}
         className="blockMenu"
         onMouseDown={(e) => e.stopPropagation()}
       >
@@ -92,17 +95,19 @@ const BlockMenu = ({
       {/* Tabs */}
       <div className="more-tabs">
         <button
-          className={activeTab === "change" ? "active" : ""}
-          onClick={() => setActiveTab("change")}
+          className={activeMenuType === "change" ? "active" : ""}
+          onClick={() => setActiveMenuType("change")}
         >
           Change
         </button>
+        {activeMenuType === 'change' && <BlockTypeMenu selectedBlock={block} onChangeType={(b)=>onChangeBlockType(b)}/>}
         <button
-          className={activeTab === "color" ? "active" : ""}
-          onClick={() => setActiveTab("color")}
+          className={activeMenuType === "color" ? "active" : ""}
+          onClick={() => setActiveMenuType("color")}
         >
           Color
         </button>
+        {activeMenuType === 'color' && ''}
       </div>
 
       

@@ -158,6 +158,7 @@ const Editor = () => {
           <div className="editor-block-row" key={block.id}>
             {openMenu?.blockId === block.id && (
               <BlockMenu
+              blockMenuRef={blockMenuRef}
                 block={widenBlock(block)}
                 mode={openMenu.mode}
                 onClose={() => openMenuActions.setToNull()}
@@ -178,12 +179,10 @@ const Editor = () => {
                     pendingFocusId.current = nId;
                   }
                 }}
-                onChangeBlockType={() =>
-                  // _type
-                  {
-                    // optional: implement later
-                    // pendingFocusId.current = replaceBlock(block.id, type);
-                  }
+                onChangeBlockType={(b) =>{
+                  pendingFocusId.current = b.id
+                }
+                  
                 }
               />
             )}
@@ -197,7 +196,11 @@ const Editor = () => {
               >
                 +
               </button>
-              <button className="drag">⋮⋮</button>
+              <button className="drag"
+              onClick={() => {
+                  openMenuActions.set({ blockId: block.id, mode: "more" });
+                }}
+              >⋮⋮</button>
             </div>
 
             {/* ---------- CONTENT ---------- */}

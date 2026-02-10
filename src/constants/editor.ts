@@ -19,6 +19,23 @@ export const BLOCK_DEFAULT_CONTENT: {
   },
 };
 
+export const BLOCK_DEFAULT_META: {
+  [K in BlockType]: BlockMetaMap[K];
+} = {
+  paragraph: {},
+  heading1: { level: 1 },
+  heading2: { level: 2 },
+  heading3: { level: 3 },
+  quote: {},
+  callout: {},
+  toggle: { collapsed: false },
+  "list-item": {
+    style: "bullet",
+    depth: 0,
+  },
+  code: {},
+  equation: {},
+};
 export const BLOCK_ITEMS: {
   type:
     | Exclude<BlockType, "list-item">
@@ -96,23 +113,6 @@ export const BLOCK_ITEMS: {
   },
 ];
 
-export const BLOCK_DEFAULT_META: {
-  [K in BlockType]: BlockMetaMap[K];
-} = {
-  paragraph: {},
-  heading1: { level: 1 },
-  heading2: { level: 2 },
-  heading3: { level: 3 },
-  quote: {},
-  callout: {},
-  toggle: { collapsed: false },
-  "list-item": {
-    style: "bullet",
-    depth: 0,
-  },
-  code: {},
-  equation: {},
-};
 
 
 

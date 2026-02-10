@@ -1,4 +1,5 @@
 import { createBlock } from "@/helper/createBlock";
+import { migrateBlock } from "@/helper/migrateBlock";
 import { widenBlock } from "@/helper/widenBlock";
 import { EditorState } from "@/types/editor";
 import { create } from "zustand";
@@ -45,14 +46,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
    * @param type type to be set to block
    * @returns id of block whose type was changed
    */
-  replaceBlock: (id, type) => {
-    const newBlock = widenBlock(createBlock(type));
+  changeType: (id, type) => {
+    // const newBlock = widenBlock(createBlock(type));
 
     set((state) => ({
-      blocks: state.blocks.map((b) => (b.id === id ? newBlock : b)),
+      blocks: state.blocks.map((b) => (b.id === id ? migrateBlock(widenBlock(b),type) : b)),
     }));
 
-    return newBlock.id;
+    return id;
   },
   /**
    * delete the block of given id
@@ -80,7 +81,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   updateBlockContent: (id, content) => {
     set((state) => ({
       blocks: state.blocks.map((b) =>
-        b.id === id ? { ...b, content } : b
+        b.id === id ? { ...b, content: content } : b
       ),
     }));
   },

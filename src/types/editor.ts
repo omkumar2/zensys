@@ -83,7 +83,7 @@ export type EditorState = {
     type: T
   ) => string;
 
-  replaceBlock: <T extends BlockType>(
+  changeType: <T extends BlockType>(
     id: string,
     type: T
   ) => string;

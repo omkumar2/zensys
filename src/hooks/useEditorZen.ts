@@ -3,7 +3,7 @@ export const useEditorZen = () => {
   const {
     blocks,
     setBlocks,
-    replaceBlock,
+    changeType,
     insertBlockAfter,
     openMenu,
     setOpenMenu,
@@ -32,7 +32,7 @@ export const useEditorZen = () => {
   const blockActions = {
     setToNull: () => setBlocks(null),
     set: setBlocks,
-    changeType: replaceBlock,
+    changeType,
     insertBlockAfter,
     delete: deleteBlock
   };

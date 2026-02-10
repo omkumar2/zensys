@@ -1,41 +1,44 @@
-// import "./blockTypeMenu.scss";
-// import { useEditorZen } from "./useEditorZen";
-// import { Block } from "@/types/editor";
+import "./blockTypeMenu.scss";
+import { AnyBlock, } from "@/types/editor";
+import { BLOCK_ITEMS as ITEMS } from "@/constants/editor";
+import { useEditorZen } from "@/hooks/useEditorZen";
 
-// import {  BLOCK_ITEMS as ITEMS } from "@/types/editor";
+type Props = {
+  selectedBlock: AnyBlock;
+  onChangeType: (block: AnyBlock) => void
+};
 
-// type Props = {
-//   selectedBlock: Block;
-//   onSelect: (blockId:string) => void;
-// };
+const BlockTypeMenu = ({ selectedBlock, onChangeType }: Props) => {
+  const { blockActions, openMenuActions, updateBlock } = useEditorZen();
+  return (
+    <div className="block-type-menu">
+      {ITEMS.map((item) => (
+        <button
+          key={item.type}
+          className={`menu-item
+            ${selectedBlock.type === item.type ? "active" : ""}
+            `}
+          onMouseDown={(e) => {
+            e.preventDefault(); // editor focus safety
 
-// const BlockTypeMenu = ({ selectedBlock, onSelect }: Props) => {
-//   const { changeBlockType, setOpenMenu } = useEditorZen();
-//   return (
-//     <div className="block-type-menu">
-//       {ITEMS.map((item) => (
-//         <button
-//           key={item.type}
-//           className={`menu-item
-//             ${selectedBlock.type === item.type ? "active" : ""}
-//             ${item.disabled ? "disabled" : ""}`}
-//           onMouseDown={(e) => {
-//             e.preventDefault(); // editor focus safety
-//             if (!item.disabled) {
-//               changeBlockType(selectedBlock.id, item.type);
-//               setOpenMenu(null);
-//               onSelect(selectedBlock.id);
-//             }
-//           }}
-//         >
-//           <span className="icon">{item.icon}</span>
-//           <span className="label">{item.label}</span>
-//           {selectedBlock.type === item.type && <span className="check">✓</span>}
-//           {item.type === "page-in" && <span className="arrow">›</span>}
-//         </button>
-//       ))}
-//     </div>
-//   );
-// };
+            if (item.type === 'bullet-list' || item.type === 'number-list' || item.type === 'todo'){
+                blockActions.changeType(selectedBlock.id,'list-item')
+                updateBlock.meta(selectedBlock.id,{style: item.type,collapsed:false})
+            }
+            else blockActions.changeType(selectedBlock.id, item.type)
+            onChangeType(selectedBlock)
+            openMenuActions.setToNull()
+          }}
+        >
+          <span className="icon">{item.icon}</span>
+          <span className="label">{item.label}</span>
+          {selectedBlock.type === 'list-item' && selectedBlock.meta.style === item.type && <span className="check">✓</span> }
+          {selectedBlock.type === item.type && <span className="check">✓</span>}
+          {/* {item.type === "page-in" && <span className="arrow">›</span>} */}
+        </button>
+      ))}
+    </div>
+  );
+};
 
-// export default BlockTypeMenu;
+export default BlockTypeMenu;
