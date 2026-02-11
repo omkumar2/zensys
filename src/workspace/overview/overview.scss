@@ -1,5 +1,189 @@
-.overview{
+.overview {
+  position: relative;
   height: 100%;
   width: 100%;
   background: #0f1115;
+  color: #ffffff;
+
+  &.loaded {
+    animation: fade-in 0.18s ease-out;
+  }
+  .overview-search-bar {
+    position: absolute;
+    height: 30px;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220px;
+  
+    svg {
+      position: absolute;
+      top: 50%;
+      left: 8px;
+      transform: translateY(-50%);
+      height: 16px;
+      color: rgb(70, 134, 190);
+    }
+  
+    input {
+      height: 100%;
+      width: 100%;
+      padding-left: 28px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      background: #181c22;
+      color: white;
+    }
+  }
+  .overview-section {
+    padding-top: 80px;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: calc(100% - 40px);
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    .overview-block {
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    
+      h2 {
+        font-size: 26px;
+        font-weight: 600;
+      }
+      .overview-scroll {
+        height: 200px;
+        padding: 10px 0px;
+        width: calc(100% - 60px);
+        // width: 60.5em;
+        flex-wrap: wrap;
+        display: flex;
+        gap: 20px;
+      
+        // overflow-x: auto;
+        overflow-y: auto;
+      
+        scroll-behavior: smooth;
+      
+        padding-bottom: 8px;
+      
+        /* Optional subtle scrollbar */
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+      
+        &::-webkit-scrollbar-thumb {
+          background: #2a2f38;
+          border-radius: 10px;
+        }
+        .card {
+          min-width: 260px;      /* Critical for horizontal scroll */
+          height: 140px;         /* Static height */
+          flex-shrink: 0;        /* Prevent shrinking */
+        
+          background: #181c22;
+          padding: 16px;
+          border-radius: 12px;
+        
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        
+          h3 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+          }
+        
+          p {
+            font-size: 13px;
+            opacity: 0.6;
+          }
+        
+          &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ===== SEARCH BAR ===== */
+
+
+/* ===== SECTION LAYOUT ===== */
+
+
+
+/* ===== HORIZONTAL SCROLL ===== */
+
+
+/* ===== CARD ===== */
+
+
+/* ===== SKELETON ===== */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #1a1d24 25%,
+    #242933 50%,
+    #1a1d24 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-card {
+  min-width: 260px;
+  height: 140px;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.skeleton-title {
+  height: 18px;
+  width: 65%;
+  margin-bottom: 14px;
+}
+
+.skeleton-line {
+  height: 14px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.skeleton-line.short {
+  width: 60%;
+}
+
+.skeleton-input {
+  height: 30px;
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* ===== FADE IN ===== */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== ERROR ===== */
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff6b6b;
 }

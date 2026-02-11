@@ -86,6 +86,7 @@ const TemplateForm = ({ selectedTemplate }: TemplateFormProps) => {
             onClick={async () => {
               try {
                 await memoryActions.memoryItem.create(title, type);
+                await memoryActions.memories.load()
                 setActiveTabTypeAndView("memory_space", "list");
               } catch (err) {
                 console.error("Failed to save memory:", err);

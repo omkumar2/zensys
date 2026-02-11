@@ -1,48 +1,11 @@
 import { useMemory } from "@/hooks/useMemory";
 import "./memory_space_list.scss";
-// import { MemoryItem, MemoryNode } from "@/memory/schema";
-import {  useEffect,useState } from "react";
 import { useActiveTab } from "@/hooks/useActiveTab";
 
 const MemorySpaceList = () => {
   const {memoryData, memoryActions} =useMemory()
   const {setActiveTabTypeAndView} =useActiveTab();
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
- useEffect(() => {
-  let cancelled = false;
-
-  setLoading(true);
-  (async()=>{
-
-    await memoryActions.memories
-    .load()
-    .catch(err => {
-      if (!cancelled) setError(String(err));
-    })
-    .finally(() => {
-      if (!cancelled) setLoading(false);
-    });
-  })()
-  return () => {
-    cancelled = true;
-  };
-}, []);
-
-
-
-console.log(memoryData.memories)  
-
-  if (loading) {
-    return <div className="memory-space-list">Loading…</div>;
-  }
-
-  if (error) {
-    return <div className="memory-space-list error">{error}</div>;
-  }
-  // if (memoryData.memories.length === 0) return
   return (
     <div className="memory-space-list">
       <h1>Memory Space</h1>

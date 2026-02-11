@@ -4,6 +4,8 @@ import Navbar from "./components/navbar/navbar";
 import Workspace from "./workspace/workspace";
 import { useEffect } from "react";
 function App() {
+
+  
   useEffect(() => {
     invoke("create_memory_spaces_dir");
   }, []);
