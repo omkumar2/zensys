@@ -45,6 +45,7 @@
     flex-direction: column;
     gap: 50px;
     .overview-block {
+      height: 200px;
       max-width: 100%;
       display: flex;
       flex-direction: column;
@@ -55,8 +56,9 @@
         font-weight: 600;
       }
       .overview-scroll {
-        height: 200px;
-        padding: 10px 0px;
+        height: 230px;
+        padding: 10px 10px;
+        
         width: calc(100% - 60px);
         // width: 60.5em;
         flex-wrap: wrap;
@@ -87,6 +89,7 @@
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 8px;
+            user-select: none;
           }
         
           p {
@@ -95,6 +98,7 @@
           }
         
           &:hover {
+            cursor: pointer;
             transform: translateY(-4px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
           }
